@@ -153,8 +153,9 @@ local playerLoaded, uiActive, inMenu = false, false, false
                         createdDate = "08/08",
                         name = data.playerName
                     },
-                    transactionsData = data.transactionHistory
-                }
+                    transactionsData = data.transactionHistory,
+                },
+                disablePincode = Config.DisablePincode
             })
         end)
     end

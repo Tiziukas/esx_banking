@@ -1,5 +1,6 @@
 Config = {
 	Debug = false,
+	DisablePincode = false,
 	DrawMarker = 10,
 	Locale = GetConvar('esx:locale', 'en'),
 	EnablePeds = true,

@@ -1,40 +1,30 @@
 var LOADED = true;
 class Components {
   static allComponents = [];
-  static generateAllComponents(generatedData, generateType = "bank") {
-    $("#wrapper").empty();
+  static generateAllComponents(generatedData, generateType = 'bank', disablePincode) {
+    $('#wrapper').empty();
     generatedData.forEach((form) => {
       let objData = {};
-      if (form.elementID.substring(1) == "transfer" && generateType == "bank") {
+      if (form.elementID.substring(1) == 'transfer' && generateType == 'bank') {
         objData = new MultiComponentsForm(form);
-      } else if (form.componentName == "trans" && generateType == "bank") {
+      } else if (form.componentName == 'trans' && generateType == 'bank') {
         objData = this.generateTransactionContainer(form);
-      } else if (
-        form.componentName == "pincodePanel" &&
-        generateType == "atm"
-      ) {
-        objData = this.generatePincodeContainer(form);
-      } else if (form.componentName == "moreGraph" && generateType == "bank") {
+      } else if (form.componentName == 'pincodePanel' && generateType == 'atm') {
+        if (!disablePincode) {
+          objData = this.generatePincodeContainer(form);
+        }
+      } else if (form.componentName == 'moreGraph' && generateType == 'bank') {
         objData = this.generateMainTemplate(form);
-        this.generateMenuTemplate(form);
-      } else if (
-        form.componentName == "atmComponent" &&
-        generateType == "atm"
-      ) {
+        this.generateMenuTemplate(form, disablePincode);
+      } else if (form.componentName == 'atmComponent' && generateType == 'atm') {
         objData = this.generateAtmTemplate(form);
       } else {
-        if (generateType == "bank") {
-          if (
-            form.componentName == "pincodePanel" ||
-            form.componentName == "atmComponent"
-          ) {
+        if (generateType == 'bank') {
+          if (form.componentName == 'pincodePanel' || form.componentName == 'atmComponent') {
             return;
           }
-        } else if (generateType == "atm") {
-          if (
-            form.componentName == "trans" ||
-            form.componentName == "moreGraph"
-          ) {
+        } else if (generateType == 'atm') {
+          if (form.componentName == 'trans' || form.componentName == 'moreGraph') {
             return;
           }
         }
@@ -57,7 +47,7 @@ class Components {
 
   static loader(appendedDiv, state) {
     $(appendedDiv).empty();
-    if (state == "show") {
+    if (state == 'show') {
       $(appendedDiv).append(`
 			<svg class="circular-loader" viewBox="25 25 50 50">
 				<circle class="loader-path" cx="50" cy="50" r="20"></circle>
@@ -67,16 +57,15 @@ class Components {
 
       setTimeout(() => {
         $(`${appendedDiv}`).fadeOut(200);
-        $("#wrapper").fadeIn().css("display", "flex");
-        if (appendedDiv == ".loader")
-          $("#container").fadeIn().css("display", "flex");
+        $('#wrapper').fadeIn().css('display', 'flex');
+        if (appendedDiv == '.loader') $('#container').fadeIn().css('display', 'flex');
         LOADED = false;
       }, 2500);
-    } else if (state == "hide") {
+    } else if (state == 'hide') {
       $(`${appendedDiv}`).fadeOut(200);
-      if (appendedDiv == ".loader") {
-        $("#wrapper").fadeOut(200);
-        $("#container").fadeOut(200);
+      if (appendedDiv == '.loader') {
+        $('#wrapper').fadeOut(200);
+        $('#container').fadeOut(200);
       }
     }
   }
@@ -125,8 +114,8 @@ class Components {
 			</div>`);
   }
 
-  static generateMenuTemplate(formData) {
-    $("#container").append(`
+  static generateMenuTemplate(formData, disablePincode) {
+    $('#container').append(`
 			<div id="menu">
 				<div id="first-column">
 
@@ -136,10 +125,10 @@ class Components {
 					<div id="your-money-panel"></div>
 
 					<div id="info-panel">
-						<div id="cpincode"></div>
+            ${!disablePincode ? '<div id="cpincode"></div>' : ''}
 					</div>
 					<hr>
-					<button class="exit-button">${formData.mainExitButtonText}</button>
+					<button class="exit-button" style="${disablePincode ? 'margin-top: 16vmin' : ''}">${formData.mainExitButtonText}</button>
 
 				</div>
 
@@ -176,14 +165,14 @@ class Components {
 }
 
 class SingleComponentsForm {
-  elementID = "";
-  buttonText = "";
-  inputPlaceholder = "";
-  title = "";
-  description = "";
-  type = "number";
-  template = "";
-  name = "";
+  elementID = '';
+  buttonText = '';
+  inputPlaceholder = '';
+  title = '';
+  description = '';
+  type = 'number';
+  template = '';
+  name = '';
 
   constructor(form) {
     this.elementID = form.elementID;
@@ -203,7 +192,7 @@ class SingleComponentsForm {
   renderInputAndButton() {
     this.template = `<h3>${this.title}</h3><p>${this.description}</p>`;
 
-    if (this.type == "password") {
+    if (this.type == 'password') {
       this.template += `<input type="password" name="pincode" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==4) return false;" placeholder="${this.inputPlaceholder}">`;
     } else {
       this.template += `<input type="number" name="${this.name}" pattern="/^-?\d+\.?\d*$/" placeholder="${this.inputPlaceholder}">`;
@@ -226,12 +215,12 @@ class SingleComponentsForm {
 }
 
 class MultiComponentsForm {
-  elementID = "";
-  buttonText = "";
-  inputPlaceholder = "";
-  inputPlaceholder2 = "";
-  title = "";
-  description = "";
+  elementID = '';
+  buttonText = '';
+  inputPlaceholder = '';
+  inputPlaceholder2 = '';
+  title = '';
+  description = '';
 
   constructor(form) {
     this.elementID = form.elementID;
@@ -267,14 +256,14 @@ class MultiComponentsForm {
 
 class Render {
   fullRenderData = {};
-  elementID = "";
-  language = "";
+  elementID = '';
+  language = '';
   constructor(elementID) {
     this.elementID = elementID;
   }
   renderBankCard() {
     const bankData = this.fullRenderData;
-    $("#bankcard").empty();
+    $('#bankcard').empty();
     let template = `<div class="title">
 		<h3>${bankData.bankName}</h3>
 		<svg id="bank-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="11445.527 -3691.757 35 25">
@@ -370,12 +359,12 @@ class Render {
 		</div>
 		<p class="cardnumber">${bankData.cardNumber}</p>
 		</div>`;
-    $(template).appendTo("#bankcard");
+    $(template).appendTo('#bankcard');
   }
 
   renderMyMoneySection() {
     const moneyData = this.fullRenderData;
-    $("#your-money-panel").empty();
+    $('#your-money-panel').empty();
     let template = `<h3>${this.language.your_money_title}</h3>
 		<p>${this.language.your_money_desc}</p>
 		<div id="money-containers">`;
@@ -383,22 +372,19 @@ class Render {
       template += `
 				<div class="money-container">
 					<h4>${this.language[`your_money_${data.name}_label`]}</h4>
-					<span id="money-${data.name}">${this.language.moneyFormat.replace(
-        "__replaceData__",
-        data.amount
-      )}</span>
+					<span id="money-${data.name}">${this.language.moneyFormat.replace('__replaceData__', data.amount)}</span>
 				</div>
 			`;
     });
 
-    template += "</div>";
+    template += '</div>';
 
-    $(template).appendTo("#your-money-panel");
+    $(template).appendTo('#your-money-panel');
   }
 
   renderTransactions() {
     const transactionData = this.fullRenderData;
-    $("#transactions-container").empty();
+    $('#transactions-container').empty();
     if (transactionData.length == 0) {
       return;
     }
@@ -411,23 +397,16 @@ class Render {
 						<span>${Utils.dateFormat(transactionData[i].time)}</span>
 					</div>
 					<span class=${
-            transactionData[i].type == this.language.withdraw ||
-            transactionData[i].type == this.language.transfer
-              ? "red-text"
-              : "green-text"
+            transactionData[i].type == this.language.withdraw || transactionData[i].type == this.language.transfer
+              ? 'red-text'
+              : 'green-text'
           }>${
-        transactionData[i].type == this.language.withdraw ||
-        transactionData[i].type == this.language.transfer
-          ? "-"
-          : "+"
-      }${this.language.moneyFormat.replace(
-        "__replaceData__",
-        transactionData[i].amount
-      )}</span>
+        transactionData[i].type == this.language.withdraw || transactionData[i].type == this.language.transfer ? '-' : '+'
+      }${this.language.moneyFormat.replace('__replaceData__', transactionData[i].amount)}</span>
 				</div>
 			`;
 
-      $(oneRow).appendTo("#transactions-container");
+      $(oneRow).appendTo('#transactions-container');
     }
   }
 
@@ -438,21 +417,11 @@ class Render {
 
   refresh(newData) {
     switch (this.elementID) {
-      case "your_money":
-        $("#money-cash").html(
-          `${this.language.moneyFormat.replace(
-            "__replaceData__",
-            newData.money
-          )} `
-        );
-        $("#money-bank").html(
-          `${this.language.moneyFormat.replace(
-            "__replaceData__",
-            newData.bankMoney
-          )}`
-        );
+      case 'your_money':
+        $('#money-cash').html(`${this.language.moneyFormat.replace('__replaceData__', newData.money)} `);
+        $('#money-bank').html(`${this.language.moneyFormat.replace('__replaceData__', newData.bankMoney)}`);
         break;
-      case "transaction":
+      case 'transaction':
         this.fullRenderData = newData;
         this.renderTransactions();
         break;
@@ -463,8 +432,8 @@ class Render {
 }
 
 class Pincode {
-  elementID = "";
-  pincode = "";
+  elementID = '';
+  pincode = '';
   constructor(elementID) {
     this.elementID = elementID;
     this.renderPinInputs();
@@ -481,14 +450,14 @@ class Pincode {
   }
 
   renderPassCode() {
-    $("#container").fadeOut();
-    this.pincode = "";
+    $('#container').fadeOut();
+    this.pincode = '';
     $(`${this.elementID} .pincode-input`).empty();
     for (let i = 0; i < 4; i++) {
       $(`${this.elementID} .pincode-input`).append(`<span></span>`);
     }
-    $(".pincode-numbers div:nth-child(12)").addClass("disable-button");
-    $(".pincode-numbers div:nth-child(12)").prop("disabled", true);
+    $('.pincode-numbers div:nth-child(12)').addClass('disable-button');
+    $('.pincode-numbers div:nth-child(12)').prop('disabled', true);
   }
 
   renderPinInputs() {
@@ -511,31 +480,31 @@ class Pincode {
   }
 }
 
-var timeZone = "";
+var timeZone = '';
 class Utils {
   static dateFormat(date) {
-    if (typeof date == "number") {
+    if (typeof date == 'number') {
       var newDate = new Date(date);
     } else {
       var newDate = date;
     }
     return newDate
       .toLocaleString([Utils.getTimeZone()], {
-        weekday: "long",
-        hour: "2-digit",
-        minute: "2-digit",
+        weekday: 'long',
+        hour: '2-digit',
+        minute: '2-digit',
       })
       .capitalize();
   }
 
   static setCardData(value) {
-    if (localStorage.getItem("CARD_DATA") == null) {
-      localStorage.setItem("CARD_DATA", JSON.stringify(value));
+    if (localStorage.getItem('CARD_DATA') == null) {
+      localStorage.setItem('CARD_DATA', JSON.stringify(value));
     }
   }
 
   static getCardData() {
-    return JSON.parse(localStorage.getItem("CARD_DATA"));
+    return JSON.parse(localStorage.getItem('CARD_DATA'));
   }
 
   static genMonth() {
@@ -545,17 +514,17 @@ class Utils {
     var year = date.getFullYear().toString();
     year = year.substr(2, year.length);
     year = parseInt(parseInt(year) + 2);
-    return parseInt(rNum + 1) + "/" + year;
+    return parseInt(rNum + 1) + '/' + year;
   }
 
   static genCardNumber() {
-    let char = "0123456789";
-    let genNum = "";
+    let char = '0123456789';
+    let genNum = '';
     for (let i = 0; i < 16; i++) {
       var rnum = Math.floor(Math.random() * char.length);
       genNum += char.substring(rnum, rnum + 1);
       if ((i + 1) % 4 == 0) {
-        genNum += " ";
+        genNum += ' ';
       }
     }
     return genNum;
@@ -573,15 +542,15 @@ class Utils {
 class Graph {
   transData = {};
   graphData = {
-    type: "line",
+    type: 'line',
     data: {
       labels: [],
       datasets: [
         {
-          label: "BALANCE",
+          label: 'BALANCE',
           data: [],
-          backgroundColor: ["rgba(75, 192, 192, 0.2)"],
-          borderColor: ["rgba(75, 192, 192, 1)"],
+          backgroundColor: ['rgba(75, 192, 192, 0.2)'],
+          borderColor: ['rgba(75, 192, 192, 1)'],
           borderWidth: 1,
         },
       ],
@@ -610,8 +579,8 @@ class Graph {
   }
 
   renderSmallGraph() {
-    const ctx = $("#smallGraph");
-    let chartStatus = Chart.getChart("smallGraph");
+    const ctx = $('#smallGraph');
+    let chartStatus = Chart.getChart('smallGraph');
 
     if (chartStatus != undefined) {
       chartStatus.destroy();
@@ -621,8 +590,8 @@ class Graph {
   }
 
   renderBigGraph() {
-    const ctx = $("#moreGraph");
-    let chartStatus = Chart.getChart("moreGraph");
+    const ctx = $('#moreGraph');
+    let chartStatus = Chart.getChart('moreGraph');
 
     if (chartStatus != undefined) {
       chartStatus.destroy();
@@ -634,14 +603,8 @@ class Graph {
   calculateGraphData() {
     this.graphData.data.labels = [];
     this.graphData.data.datasets[0].data = [];
-    this.graphData.data.datasets[0].borderColor = [
-      getComputedStyle(document.body).getPropertyValue("--graphLineColor"),
-    ];
-    this.graphData.data.datasets[0].backgroundColor = [
-      getComputedStyle(document.body).getPropertyValue(
-        "--graphLineBackgroundColor"
-      ),
-    ];
+    this.graphData.data.datasets[0].borderColor = [getComputedStyle(document.body).getPropertyValue('--graphLineColor')];
+    this.graphData.data.datasets[0].backgroundColor = [getComputedStyle(document.body).getPropertyValue('--graphLineBackgroundColor')];
     for (let transaction of [...this.transData].slice(0, 50).reverse()) {
       this.graphData.data.labels.push(Utils.dateFormat(transaction.time));
       this.graphData.data.datasets[0].data.push(transaction.balance);
@@ -665,7 +628,7 @@ class GlobalStore {
   }
 }
 
-Object.defineProperty(String.prototype, "capitalize", {
+Object.defineProperty(String.prototype, 'capitalize', {
   value: function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
   },
@@ -675,14 +638,14 @@ Object.defineProperty(String.prototype, "capitalize", {
 $(document).ready(function () {
   var formData;
   var language;
-  $.getJSON("config.json", function (data) {
-    let lang = "EN";
+  $.getJSON('config.json', function (data) {
+    let lang = 'EN';
     if (data[data.lang] != null) {
       lang = data.lang;
     }
-    Utils.setTimeZone(lang == "HU" ? "hu-HU" : "en-GB");
-    formData = new GlobalStore(data[lang]["DYNAMIC_FORM_DATA"]);
-    language = new GlobalStore(data[lang]["LAUNGAGE"]);
+    Utils.setTimeZone(lang == 'HU' ? 'hu-HU' : 'en-GB');
+    formData = new GlobalStore(data[lang]['DYNAMIC_FORM_DATA']);
+    language = new GlobalStore(data[lang]['LAUNGAGE']);
   }).fail(function (error) {
     console.log("Can't load JSON file! " + error);
   });
@@ -690,75 +653,76 @@ $(document).ready(function () {
   var inputData = new GlobalStore({});
   var transactionData;
 
-  let yourMoney = new Render("your_money");
-  let transaction = new Render("transaction");
-  let bankcard = new Render("bankcard");
-  let graph = "";
-  var pincode = "";
-  var type = "";
+  let yourMoney = new Render('your_money');
+  let transaction = new Render('transaction');
+  let bankcard = new Render('bankcard');
+  let graph = '';
+  var pincode = '';
+  var type = '';
 
   Utils.setCardData({
     cardNumber: Utils.genCardNumber(),
     cardExpiry: Utils.genMonth(),
   });
 
-  function bankRender() {
-    Components.generateAllComponents(formData.getStoredData());
+  function bankRender(disablePincode) {
+    Components.generateAllComponents(formData.getStoredData(), 'bank', disablePincode);
   }
 
-  function ATMRender() {
-    Components.generateAllComponents(formData.getStoredData(), "atm");
-    pincode = new Pincode("#pincode-container");
-    Components.getComponent("atmComponent").fadeOut();
-    Components.getComponent("withdraw").setElementId(".secondGridColumn");
-    Components.getComponent("withdraw").renderInputAndButton();
-    Components.getComponent("deposit").setElementId(".secondGridColumn");
-    Components.getComponent("deposit").renderInputAndButton();
+  function ATMRender(disablePincode) {
+    Components.generateAllComponents(formData.getStoredData(), 'atm', disablePincode);
+    Components.getComponent('atmComponent').fadeOut();
+    Components.getComponent('withdraw').setElementId('.secondGridColumn');
+    Components.getComponent('withdraw').renderInputAndButton();
+    Components.getComponent('deposit').setElementId('.secondGridColumn');
+    Components.getComponent('deposit').renderInputAndButton();
 
+    if (disablePincode) {
+      return Components.getComponent('atmComponent').fadeIn(200);
+    }
+
+    pincode = new Pincode('#pincode-container');
     pincode.show();
   }
 
-  function handleTransactionLabel(label, languageText){
+  function handleTransactionLabel(label, languageText) {
     const defaultLabelList = {
       WITHDRAW: languageText.withdraw,
       DEPOSIT: languageText.deposit,
-      TRANSFER_RECEIVE: languageText.transferReceive
-    }
+      TRANSFER_RECEIVE: languageText.transferReceive,
+    };
 
-    return defaultLabelList[label.toUpperCase()] ?? label ?? languageText.transfer
+    return defaultLabelList[label.toUpperCase()] ?? label ?? languageText.transfer;
   }
 
-  $(document).on("click", ".pincode-numbers div", function () {
+  $(document).on('click', '.pincode-numbers div', function () {
     if (pincode.getPincode().length + 1 == 4) {
-      $(".pincode-numbers div:nth-child(12)").removeClass("disable-button");
-      $(".pincode-numbers div:nth-child(12)").prop("disabled", false);
+      $('.pincode-numbers div:nth-child(12)').removeClass('disable-button');
+      $('.pincode-numbers div:nth-child(12)').prop('disabled', false);
     }
 
     let currentNumber = $(this).text();
-    $(".pincode-input span").each(function () {
-      let spanText = $(this).attr("number");
+    $('.pincode-input span').each(function () {
+      let spanText = $(this).attr('number');
       if (!spanText) {
-        $(this).attr("number", currentNumber);
-        $(this).addClass("circleBackground");
+        $(this).attr('number', currentNumber);
+        $(this).addClass('circleBackground');
         pincode.setPincode(currentNumber);
         return false;
       }
     });
   });
 
-  $(document).on("click", ".pincode-numbers div:nth-child(11)", function () {
+  $(document).on('click', '.pincode-numbers div:nth-child(11)', function () {
     pincode.renderPassCode();
   });
 
-  $(document).on("click", ".pincode-numbers div:nth-child(12)", function () {
-    $.post(
-      "https://esx_banking/checkPincode",
-      JSON.stringify(pincode.getPincode())
-    ).then((response) => {
+  $(document).on('click', '.pincode-numbers div:nth-child(12)', function () {
+    $.post('https://esx_banking/checkPincode', JSON.stringify(pincode.getPincode())).then((response) => {
       if (response.success) {
-        Components.loader("#pincode-container", "show");
+        Components.loader('#pincode-container', 'show');
         setTimeout(() => {
-          Components.getComponent("atmComponent").fadeIn(200);
+          Components.getComponent('atmComponent').fadeIn(200);
         }, 2800);
       } else if (response.error) {
         pincode.renderPassCode();
@@ -766,7 +730,7 @@ $(document).ready(function () {
     });
   });
 
-  window.addEventListener("message", ({ data }) => {
+  window.addEventListener('message', ({ data }) => {
     const languageText = language.getStoredData();
     if (data.showMenu) {
       const datas = data.datas;
@@ -776,16 +740,16 @@ $(document).ready(function () {
       transData.map((trans) => {
         trans.id = trans.time;
         trans.time = Utils.dateFormat(trans.time);
-        const currentLabel = handleTransactionLabel(trans.label, languageText)
+        const currentLabel = handleTransactionLabel(trans.label, languageText);
         trans.label = currentLabel;
         switch (trans.type) {
-          case "WITHDRAW":
+          case 'WITHDRAW':
             trans.type = languageText.withdraw;
             break;
-          case "DEPOSIT":
+          case 'DEPOSIT':
             trans.type = languageText.deposit;
             break;
-          case "TRANSFER_RECEIVE":
+          case 'TRANSFER_RECEIVE':
             trans.type = languageText.transferReceive;
             break;
           default:
@@ -798,12 +762,12 @@ $(document).ready(function () {
       graph = new Graph(transData, languageText.graphTitle);
 
       if (data.openATM) {
-        ATMRender();
-        type = "ATM";
+        ATMRender(data.disablePincode);
+        type = 'ATM';
         transaction.setData(transData, languageText);
       } else {
-        type = "BANK";
-        bankRender();
+        type = 'BANK';
+        bankRender(data.disablePincode);
         graph.renderSmallGraph();
 
         transaction.setData(transData, languageText);
@@ -819,7 +783,7 @@ $(document).ready(function () {
       yourMoney.setData(datas.your_money_panel, languageText);
       yourMoney.renderMyMoneySection();
 
-      Components.loader(".loader", "show");
+      Components.loader('.loader', 'show');
     } else if (data.updateData) {
       const currentInputValues = inputData.getStoredData();
       const updateTransData = transactionData.getStoredData();
@@ -844,27 +808,27 @@ $(document).ready(function () {
       });
       yourMoney.refresh(data.data);
       transaction.refresh(updateTransData);
-      if (type == "BANK") graph.refreshGraphData(updateTransData);
+      if (type == 'BANK') graph.refreshGraphData(updateTransData);
     }
   });
 
   function resetContainerAndSetTitle(title) {
-    $("#menu").fadeOut();
-    $("#title-container h3").text(title);
-    $("#more-modal-container").empty();
+    $('#menu').fadeOut();
+    $('#title-container h3').text(title);
+    $('#more-modal-container').empty();
   }
 
-  $(document).on("click", "#more_graph", function () {
+  $(document).on('click', '#more_graph', function () {
     resetContainerAndSetTitle(language.getStoredData().moreGraphTitle);
-    $("#modal-container").fadeIn();
-    $("#more-modal-container").html('<canvas id="moreGraph"></canvas>');
+    $('#modal-container').fadeIn();
+    $('#more-modal-container').html('<canvas id="moreGraph"></canvas>');
     graph.renderBigGraph();
   });
 
-  $(document).on("click", "#more_history", function () {
+  $(document).on('click', '#more_history', function () {
     const lang = language.getStoredData();
     resetContainerAndSetTitle(lang.moreHistoryTitle);
-    $("#more-modal-container").html(`
+    $('#more-modal-container').html(`
 		<table id="example" class="display" style="width:100%">
 			<thead>
 				<tr>
@@ -877,16 +841,16 @@ $(document).ready(function () {
 				</tr>
 			</thead>
 		</table>`);
-    $("#example").DataTable({
+    $('#example').DataTable({
       responsive: true,
       data: transactionData.getStoredData(),
       columns: [
-        { data: "id" },
-        { data: "label", title: lang.tableLang.transactionLabel },
-        { data: "type", title: lang.tableLang.typeLabel },
-        { data: "balance", title: lang.tableLang.balanceLabel },
-        { data: "amount", title: lang.tableLang.amountLabel },
-        { data: "time", title: lang.tableLang.timeLabel },
+        { data: 'id' },
+        { data: 'label', title: lang.tableLang.transactionLabel },
+        { data: 'type', title: lang.tableLang.typeLabel },
+        { data: 'balance', title: lang.tableLang.balanceLabel },
+        { data: 'amount', title: lang.tableLang.amountLabel },
+        { data: 'time', title: lang.tableLang.timeLabel },
       ],
       columnDefs: [
         {
@@ -900,39 +864,35 @@ $(document).ready(function () {
         },
       ],
       createdRow: function (row, data, index) {
-        let parseType = data.type.replace(/[\$,]/g, "");
-        $("td", row).eq(2).text(`$${data.balance}`);
+        let parseType = data.type.replace(/[\$,]/g, '');
+        $('td', row).eq(2).text(`$${data.balance}`);
         if (parseType == lang.deposit || parseType == lang.transferReceive) {
-          $("td", row).eq(3).addClass("greenTableText");
-          $("td", row)
+          $('td', row).eq(3).addClass('greenTableText');
+          $('td', row)
             .eq(3)
-            .html(
-              `+${lang.moneyFormat.replace("__replaceData__", data.amount)}`
-            );
+            .html(`+${lang.moneyFormat.replace('__replaceData__', data.amount)}`);
         } else if (parseType == lang.withdraw || parseType == lang.transfer) {
-          $("td", row).eq(3).addClass("redTableText");
-          $("td", row)
+          $('td', row).eq(3).addClass('redTableText');
+          $('td', row)
             .eq(3)
-            .html(
-              `-${lang.moneyFormat.replace("__replaceData__", data.amount)}`
-            );
+            .html(`-${lang.moneyFormat.replace('__replaceData__', data.amount)}`);
         }
       },
-      order: [[0, "desc"]],
-      scrollY: "450px",
+      order: [[0, 'desc']],
+      scrollY: '450px',
       scrollX: true,
       scrollCollapse: true,
       fixedColumns: {
-        heightMatch: "none",
+        heightMatch: 'none',
       },
       language: {
         url: `https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/${lang.tableLang.tableFullLanguage}.json`,
-        search: "",
+        search: '',
         searchPlaceholder: lang.tableLang.searchInputPlaceholder,
       },
     });
 
-    $("#modal-container").fadeIn();
+    $('#modal-container').fadeIn();
   });
 
   let inputs = {
@@ -940,62 +900,56 @@ $(document).ready(function () {
     second: false,
   };
 
-  $(document).on(
-    "keyup",
-    'input[type="number"] , input[type="password"]',
-    function () {
-      let buttonGroup = $(this)
-        .closest(".input-groups-container")
-        .find("button");
+  $(document).on('keyup', 'input[type="number"] , input[type="password"]', function () {
+    let buttonGroup = $(this).closest('.input-groups-container').find('button');
 
-      if (buttonGroup.length > 0) {
-        let name = $(this).attr("name");
-        if (name == "moneyAmount") {
-          inputs.first = $(this).val() != "";
-        } else {
-          inputs.second = $(this).val() != "";
-        }
+    if (buttonGroup.length > 0) {
+      let name = $(this).attr('name');
+      if (name == 'moneyAmount') {
+        inputs.first = $(this).val() != '';
+      } else {
+        inputs.second = $(this).val() != '';
+      }
 
-        if (inputs.first && inputs.second) {
-          buttonGroup.removeClass("disable-button");
-          buttonGroup.prop("disabled", false);
-        } else {
-          buttonGroup.addClass("disable-button");
-          buttonGroup.prop("disabled", true);
-        }
+      if (inputs.first && inputs.second) {
+        buttonGroup.removeClass('disable-button');
+        buttonGroup.prop('disabled', false);
+      } else {
+        buttonGroup.addClass('disable-button');
+        buttonGroup.prop('disabled', true);
+      }
 
+      return;
+    }
+
+    let button = $(this).next('button');
+
+    if ($(this).val() != '') {
+      if ($(this).attr('name') == 'pincode' && $(this).val().length < 4) {
         return;
       }
 
-      let button = $(this).next("button");
-
-      if ($(this).val() != "") {
-        if ($(this).attr("name") == "pincode" && $(this).val().length < 4) {
-          return;
-        }
-
-        button.removeClass("disable-button");
-        button.prop("disabled", false);
-      } else {
-        button.addClass("disable-button");
-        button.prop("disabled", true);
-      }
+      button.removeClass('disable-button');
+      button.prop('disabled', false);
+    } else {
+      button.addClass('disable-button');
+      button.prop('disabled', true);
     }
-  );
+  });
 
-  $(document).on("click", ".accept-button", function () {
-    let buttonGroup = $(this).closest(".input-groups-container").find("button");
+  $(document).on('click', '.accept-button', function () {
+    let buttonGroup = $(this).closest('.input-groups-container').find('button');
     let inputValues = {};
     if (buttonGroup.length > 0) {
-      inputValues["transfer"] = {};
-      $(".input-groups-container input").each(function () {
-        inputValues["transfer"][$(this).attr("name")] = $(this).val();
+      inputValues['transfer'] = {};
+      $('.input-groups-container input').each(function () {
+        inputValues['transfer'][$(this).attr('name')] = $(this).val();
         $(this).val(null);
         inputs.first = false;
         inputs.second = false;
       });
     } else {
-      let inputValue = $(this).prev("input").val();
+      let inputValue = $(this).prev('input').val();
       if (inputValue == undefined) {
         return;
       }
@@ -1003,33 +957,33 @@ $(document).ready(function () {
         return;
       }
 
-      inputValues[$(this).prev("input").attr("name")] = inputValue;
+      inputValues[$(this).prev('input').attr('name')] = inputValue;
 
-      $(this).prev("input").val(null);
+      $(this).prev('input').val(null);
     }
 
     inputData.setStoredData(inputValues);
-    $.post("https://esx_banking/clickButton", JSON.stringify(inputValues));
+    $.post('https://esx_banking/clickButton', JSON.stringify(inputValues));
 
-    $(this).addClass("disable-button");
-    $(this).prop("disabled", true);
+    $(this).addClass('disable-button');
+    $(this).prop('disabled', true);
   });
 
-  $(document).on("click", "#close-button", function () {
-    $("#modal-container").fadeOut();
-    $("#menu").fadeIn();
+  $(document).on('click', '#close-button', function () {
+    $('#modal-container').fadeOut();
+    $('#menu').fadeIn();
   });
 
-  $(document).on("click", ".exit-button", function () {
-    Components.loader(".loader", "hide");
-    $.post("https://esx_banking/close", JSON.stringify({}));
+  $(document).on('click', '.exit-button', function () {
+    Components.loader('.loader', 'hide');
+    $.post('https://esx_banking/close', JSON.stringify({}));
   });
 
   $(document).keyup(function (e) {
     if (e.which == 27) {
       if (!LOADED) {
-        Components.loader(".loader", "hide");
-        $.post("https://esx_banking/close", JSON.stringify({}));
+        Components.loader('.loader', 'hide');
+        $.post('https://esx_banking/close', JSON.stringify({}));
       }
     }
   });
