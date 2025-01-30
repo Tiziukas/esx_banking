@@ -1,4 +1,4 @@
-Locales['tr'] = {
+return {
     ['invalid_amount'] = 'Bu geçersiz bir miktar para',
     ['deposit_money']  = 'Para yatırdınız: $%s',
     ['withdraw_money'] = 'Para çektiniz: $%s',

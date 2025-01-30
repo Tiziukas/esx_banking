@@ -1,4 +1,4 @@
-Locales['sl'] = {
+return {
   ['invalid_amount'] = 'Neveljavna količina',
   ['deposit_money']  = 'Vi ste položili $%s',
   ['withdraw_money'] = 'Vi ste Dvignili $%s',

@@ -1,4 +1,4 @@
-Locales['sv'] = {
+return {
     ['invalid_amount'] = 'Detta är en ogiltig summa pengar',
     ['deposit_money']  = 'Du har suttit in %skr',
     ['withdraw_money'] = 'Du har tagit ut %skr',

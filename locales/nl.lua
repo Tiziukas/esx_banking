@@ -1,4 +1,4 @@
-Locales['nl'] = {
+return {
   ['invalid_amount'] = 'Ongeldig bedrag',
   ['deposit_money']  = 'Je hebt €%s gestort',
   ['withdraw_money'] = 'Je hebt €%s opgenomen',

@@ -1,4 +1,4 @@
-Locales['es'] = {
+return {
     ['invalid_amount'] = 'No es una cantidad válida',
     ['deposit_money']  = 'Has depositado $%s',
     ['withdraw_money'] = 'Has retirado $%s',

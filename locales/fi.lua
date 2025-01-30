@@ -1,4 +1,4 @@
-Locales['fi'] = {
+return {
   ['invalid_amount'] = 'Virheellinen summa',
   ['deposit_money']  = 'Olet tallettanut $%s',
   ['withdraw_money'] = 'Olet nostanut $%s',

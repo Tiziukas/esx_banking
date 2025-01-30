@@ -1,4 +1,4 @@
-Locales['et'] = {
+return {
   ['invalid_amount'] = 'Tundmatu kogus raha',
   ['deposit_money']  = 'Sa sisestasid $%s',
   ['withdraw_money'] = 'Sa võtsid välja $%s',

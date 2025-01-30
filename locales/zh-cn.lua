@@ -1,4 +1,4 @@
-Locales['zh-cn'] = {
+return {
   ['invalid_amount'] = '无效的金额输入!',
   ['deposit_money']  = '您已存入-$%s',
   ['withdraw_money'] = '你已提取-$%s',
